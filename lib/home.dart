@@ -1,7 +1,6 @@
-// ignore_for_file: library_private_types_in_public_api, prefer_interpolation_to_compose_strings
+// ignore_for_file: library_private_types_in_public_api, prefer_interpolation_to_compose_strings, constant_identifier_names
 
 import 'dart:typed_data';
-
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:my_vpn/api_client.dart';
@@ -9,6 +8,7 @@ import 'package:my_vpn/components/custom_button.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:screenshot/screenshot.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
 enum ButtonState { RemoveBg, Save }
 
@@ -138,7 +138,33 @@ class _RemoveBackgroundState extends State<RemoveBackground> {
       String directory = (await getExternalStorageDirectory())!.path;
       String fileName =
           DateTime.now().microsecondsSinceEpoch.toString() + ".png";
-      await screenshotController.captureAndSave(directory, fileName: fileName);
+      final imageSaved = await screenshotController.captureAndSave(directory,
+          fileName: fileName);
+
+      if (imageSaved != null) {
+        // Show a toast message on successful save
+        Fluttertoast.showToast(
+          msg: "Image saved successfully to Gallery!",
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.BOTTOM,
+          timeInSecForIosWeb: 1,
+          backgroundColor: Colors.green,
+          textColor: Colors.white,
+          fontSize: 16.0,
+        );
+      } else {
+        // Optionally, handle the failure to save the image
+        Fluttertoast.showToast(
+          msg: "Failed to save image.",
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.BOTTOM,
+          timeInSecForIosWeb: 1,
+          backgroundColor: Colors.red,
+          textColor: Colors.white,
+          fontSize: 16.0,
+        );
+      }
+
       // Clear the image after saving to avoid unnecessary memory usage
       imageFile = null;
       buttonState = ButtonState.RemoveBg;
